@@ -1,15 +1,16 @@
-package main
+package server
 
 import (
-	"github.com/go-idp/logs/config"
 	"github.com/go-idp/logs/server"
+	"github.com/go-idp/logs/server/config"
 	"github.com/go-zoox/cli"
+	"github.com/go-zoox/fs"
 )
 
-func registerServe(app *cli.MultipleProgram) {
-	app.Register("serve", &cli.Command{
-		Name:  "serve",
-		Usage: "Start the logs service",
+func Register(app *cli.MultipleProgram) {
+	app.Register("server", &cli.Command{
+		Name:  "server",
+		Usage: "the logs server",
 		Flags: []cli.Flag{
 			&cli.IntFlag{
 				Name:    "port",
@@ -53,21 +54,48 @@ func registerServe(app *cli.MultipleProgram) {
 				EnvVars: []string{"STORAGE_OSS_ENDPOINT"},
 				// Required: true,
 			},
+			&cli.StringFlag{
+				Name:    "username",
+				Usage:   "Username for Basic Auth",
+				EnvVars: []string{"USERNAME"},
+			},
+			&cli.StringFlag{
+				Name:    "password",
+				Usage:   "Password for Basic Auth",
+				EnvVars: []string{"PASSWORD"},
+			},
 		},
 		Action: func(ctx *cli.Context) (err error) {
-			return server.New(&config.Config{
-				Port: ctx.Int("port"),
-				Storage: config.Storage{
-					Driver: ctx.String("storage-driver"),
-					//
-					RootDIR: ctx.String("storage-root-dir"),
-					//
-					OSSAccessKeyID:     ctx.String("storage-oss-access-key-id"),
-					OSSAccessKeySecret: ctx.String("storage-oss-access-key-secret"),
-					OSSBucket:          ctx.String("storage-oss-bucket"),
-					OSSEndpoint:        ctx.String("storage-oss-endpoint"),
-				},
-			})
+			cfg := config.Get()
+			// Port
+			cfg.Port = ctx.Int("port")
+			// Storage
+			cfg.Storage.Driver = ctx.String("storage-driver")
+			cfg.Storage.RootDIR = ctx.String("storage-root-dir")
+			cfg.Storage.OSSAccessKeyID = ctx.String("storage-oss-access-key-id")
+			cfg.Storage.OSSAccessKeySecret = ctx.String("storage-oss-access-key-secret")
+			cfg.Storage.OSSBucket = ctx.String("storage-oss-bucket")
+			cfg.Storage.OSSEndpoint = ctx.String("storage-oss-endpoint")
+			// Auth
+			cfg.Auth.Username = ctx.String("username")
+			cfg.Auth.Password = ctx.String("password")
+
+			if cfg.Storage.Driver == "fs" {
+				if cfg.Storage.RootDIR == "" {
+					cfg.Storage.RootDIR = fs.JoinCurrentDir("data")
+				}
+			} else {
+				if cfg.Storage.RootDIR == "" {
+					cfg.Storage.RootDIR = "/data"
+				}
+			}
+
+			s, err := server.New()
+			if err != nil {
+				return err
+			}
+
+			return s.Run()
 		},
 	})
 }

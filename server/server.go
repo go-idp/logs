@@ -1,17 +1,51 @@
 package server
 
 import (
-	"github.com/go-idp/logs/config"
+	"github.com/go-idp/logs"
+	"github.com/go-idp/logs/server/config"
+	"github.com/go-idp/logs/server/storage/fs"
+	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/core-utils/fmt"
+	"github.com/go-zoox/zoox"
 	"github.com/go-zoox/zoox/defaults"
 )
 
-func New(cfg *config.Config) error {
+type Server interface {
+	Run() error
+}
+
+type server struct {
+	cfg *config.Config
+}
+
+func New() (Server, error) {
+	cfg := config.Get()
+	fs.Get().Setup(func(c *fs.Config) {
+		c.RootDIR = cfg.Storage.RootDIR
+	})
+	oss.Get().SetUp(func(c *oss.Config) {
+		c.RootDIR = cfg.Storage.RootDIR
+		c.AccessKeyID = cfg.Storage.OSSAccessKeyID
+		c.AccessKeySecret = cfg.Storage.OSSAccessKeySecret
+		c.Bucket = cfg.Storage.OSSBucket
+		c.Endpoint = cfg.Storage.OSSEndpoint
+	})
+
+	s := &server{
+		cfg: cfg,
+	}
+
+	return s, nil
+}
+
+func (s *server) Run() error {
 	app := defaults.Default()
 
+	app.Use(Auth())
+
 	//
-	app.Post("/:id/create", Create())
-	app.Post("/:id/destroy", Destroy())
+	app.Post("/:id/open", Open())
+	app.Post("/:id/finish", Finish())
 	//
 	app.Post("/:id/publish", Publish())
 	app.Post("/:id/subscribe", Subscribe())
@@ -19,7 +53,14 @@ func New(cfg *config.Config) error {
 	app.Get("/:id/stream", Stream())
 
 	//
-	// app.Get("/:id", Get())
+	app.Get("/:id", Get())
 
-	return app.Run(fmt.Sprintf(":%d", cfg.Port))
+	app.Get("/", func(ctx *zoox.Context) {
+		ctx.JSON(200, zoox.H{
+			"name":    "logs service for idp",
+			"version": logs.Version,
+		})
+	})
+
+	return app.Run(fmt.Sprintf(":%d", s.cfg.Port))
 }

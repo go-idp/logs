@@ -10,7 +10,7 @@ import (
 	"github.com/go-zoox/fs"
 )
 
-func Create(ctx context.Context, topic string) error {
+func Open(ctx context.Context, topic string) error {
 	// check if topic exists
 	if ok := topicStore.Has(topic); ok {
 		return fmt.Errorf("topic %s already exists", topic)

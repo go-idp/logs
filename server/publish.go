@@ -9,7 +9,7 @@ import (
 )
 
 type PublishDTO struct {
-	Messages []string `body:"messages"`
+	Message string `body:"message"`
 }
 
 func Publish() func(ctx *zoox.Context) {
@@ -24,16 +24,14 @@ func Publish() func(ctx *zoox.Context) {
 			ctx.Fail(err, http.StatusBadRequest, fmt.Sprintf("failed to bind body: %s", err))
 			return
 		}
-		if len(data.Messages) == 0 {
+		if len(data.Message) == 0 {
 			ctx.Fail(nil, http.StatusBadRequest, "messages is required")
 			return
 		}
 
-		for _, message := range data.Messages {
-			if err := pubsub.Publish(ctx.Context(), id, message); err != nil {
-				ctx.Fail(err, http.StatusInternalServerError, fmt.Sprintf("failed to publish topic: %s", err))
-				return
-			}
+		if err := pubsub.Publish(ctx.Context(), id, data.Message); err != nil {
+			ctx.Fail(err, http.StatusInternalServerError, fmt.Sprintf("failed to publish topic: %s", err))
+			return
 		}
 
 		ctx.Success(nil)

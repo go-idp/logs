@@ -43,11 +43,13 @@ func Publish(ctx context.Context, topic string, message string) error {
 		return
 	})
 
-	// write to file
-	// _, err := file.Writer.Write([]byte(fmt.Sprintf("%d %s %d\n", msg.ID, msg.Content, msg.Timestamp)))
-	_, err := file.Writer.Write([]byte(msg.Content))
-	if err != nil {
-		return fmt.Errorf("failed to write to file: %s", err)
+	if message != "[DONE]" {
+		// write to file
+		// _, err := file.Writer.Write([]byte(fmt.Sprintf("%d %s %d\n", msg.ID, msg.Content, msg.Timestamp)))
+		_, err := file.Writer.Write([]byte(msg.Content))
+		if err != nil {
+			return fmt.Errorf("failed to write to file: %s", err)
+		}
 	}
 
 	return messagesStore.Set(topic, messages)

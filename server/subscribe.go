@@ -39,7 +39,9 @@ func Subscribe() func(ctx *zoox.Context) {
 		}
 
 		if err := pubsub.Subscribe(ctx.Context(), id, handler); err != nil {
-			ctx.Fail(err, http.StatusInternalServerError, fmt.Sprintf("failed to subscribe topic: %s", err))
+			// ctx.Fail(err, http.StatusBadRequest, err.Error())
+			ctx.SSE().Event("message", err.Error())
+			ctx.SSE().Event("message", "[DONE]")
 			return
 		}
 
@@ -48,10 +50,10 @@ func Subscribe() func(ctx *zoox.Context) {
 			case <-ctx.Context().Done():
 				return
 			case <-done.Done():
-				ctx.Success(zoox.H{
-					"code":    200,
-					"message": "success",
-				})
+				// ctx.Success(zoox.H{
+				// 	"code":    200,
+				// 	"message": "success",
+				// })
 				return
 			}
 		}

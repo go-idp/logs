@@ -9,16 +9,16 @@ import (
 )
 
 type FS struct {
-	cfg *FSConfig
+	cfg *Config
 }
 
-type FSConfig struct {
+type Config struct {
 	RootDIR string
 }
 
-type FSOption func(cfg *FSConfig)
+type Option func(cfg *Config)
 
-func New() storage.Storage {
+func New() *FS {
 	return &FS{}
 }
 
@@ -49,8 +49,8 @@ func (o *FS) Put(path string, stream io.Reader) error {
 	return nil
 }
 
-func (o *FS) Setup(opts ...FSOption) error {
-	cfg := &FSConfig{}
+func (o *FS) Setup(opts ...Option) error {
+	cfg := &Config{}
 	for _, opt := range opts {
 		opt(cfg)
 	}
@@ -60,6 +60,6 @@ func (o *FS) Setup(opts ...FSOption) error {
 	return nil
 }
 
-func Get() storage.Storage {
+func Get() *FS {
 	return once.Get("storage.fs", New)
 }

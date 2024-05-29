@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/go-idp/logs"
+	"github.com/go-idp/logs/cmd/logs/client"
+	"github.com/go-idp/logs/cmd/logs/server"
 	"github.com/go-zoox/cli"
 )
 
@@ -12,7 +14,8 @@ func main() {
 		Version: logs.Version,
 	})
 
-	registerServe(app)
+	server.Register(app)
+	client.Register(app)
 
 	app.Run()
 }

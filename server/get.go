@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-idp/logs/config"
+	"github.com/go-idp/logs/server/config"
 	"github.com/go-idp/logs/server/storage/fs"
 	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/headers"
@@ -28,14 +28,14 @@ func Get() func(ctx *zoox.Context) {
 		case "oss":
 			reader, err = oss.Get().Get(ctx.Path)
 			if err != nil {
-				ctx.Logger.Errorf("failed to get file path: %s (err: %s)", ctx.Path, err)
+				ctx.Logger.Errorf("failed to get file path from fs: %s (err: %s)", ctx.Path, err)
 				ctx.Error(http.StatusNotFound, "Not Found")
 				return
 			}
 		default:
 			reader, err = fs.Get().Get(ctx.Path)
 			if err != nil {
-				ctx.Logger.Errorf("failed to get file path: %s (err: %s)", ctx.Path, err)
+				ctx.Logger.Errorf("failed to get file path from oss: %s (err: %s)", ctx.Path, err)
 				ctx.Error(http.StatusNotFound, "Not Found")
 				return
 			}
