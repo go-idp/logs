@@ -40,7 +40,17 @@ func Subscribe() func(ctx *zoox.Context) {
 
 		if err := pubsub.Subscribe(ctx.Context(), id, handler); err != nil {
 			// ctx.Fail(err, http.StatusBadRequest, err.Error())
-			ctx.SSE().Event("message", err.Error())
+			errMessage := map[string]any{
+				"code":    400,
+				"message": err.Error(),
+			}
+			errMessageBytes, errx := json.Marshal(errMessage)
+			if errx != nil {
+				ctx.Fail(errx, http.StatusInternalServerError, fmt.Sprintf("failed to marshal error message: %s", errx))
+				return
+			}
+
+			ctx.SSE().Event("message", string(errMessageBytes))
 			ctx.SSE().Event("message", "[DONE]")
 			return
 		}
