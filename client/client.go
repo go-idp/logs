@@ -1,11 +1,13 @@
 package client
 
+import "context"
+
 type Client interface {
-	Open(id string) error
-	Finish(id string) error
+	Open(ctx context.Context, id string) error
+	Finish(ctx context.Context, id string) error
 	//
-	Publish(id string, message string) error
-	Subscribe(id string, fn func(message string)) error
+	Publish(ctx context.Context, id string, message string) error
+	Subscribe(ctx context.Context, id string, fn func(message string)) error
 }
 
 type client struct {

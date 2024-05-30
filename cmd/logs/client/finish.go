@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-idp/logs/client"
@@ -28,7 +29,7 @@ func Finish() *cli.Command {
 				return fmt.Errorf("id is required")
 			}
 
-			return c.Finish(id)
+			return c.Finish(context.Background(), id)
 		},
 	}
 }

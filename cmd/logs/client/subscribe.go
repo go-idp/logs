@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -29,7 +30,7 @@ func Subscribe() *cli.Command {
 				return fmt.Errorf("id is required")
 			}
 
-			return c.Subscribe(id, func(message string) {
+			return c.Subscribe(context.Background(), id, func(message string) {
 				os.Stdout.WriteString(message)
 			})
 		},

@@ -1,13 +1,15 @@
 package client
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-zoox/fetch"
 )
 
-func (c *client) Publish(id string, message string) error {
+func (c *client) Publish(ctx context.Context, id string, message string) error {
 	response, err := fetch.Post(fmt.Sprintf("%s/:id/publish", c.cfg.Server), &fetch.Config{
+		Context: ctx,
 		Params: fetch.Params{
 			"id": id,
 		},

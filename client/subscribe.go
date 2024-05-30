@@ -1,14 +1,16 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-zoox/fetch"
 )
 
-func (c *client) Subscribe(id string, fn func(message string)) error {
+func (c *client) Subscribe(ctx context.Context, id string, fn func(message string)) error {
 	response, err := fetch.Stream(fmt.Sprintf("%s/:id/stream", c.cfg.Server), &fetch.Config{
+		Context: ctx,
 		Params: fetch.Params{
 			"id": id,
 		},

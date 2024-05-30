@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-idp/logs/client"
@@ -29,7 +30,7 @@ func Publish() *cli.Command {
 				return fmt.Errorf("id and message are required")
 			}
 
-			return c.Publish(id, message)
+			return c.Publish(context.Background(), id, message)
 		},
 	}
 }
