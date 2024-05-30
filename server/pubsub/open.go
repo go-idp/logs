@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-zoox/core-utils/safe"
+	"github.com/go-zoox/datetime"
 	"github.com/go-zoox/fs"
 )
 
@@ -27,7 +28,7 @@ func Open(ctx context.Context, topic string) error {
 	})
 	messages.Enqueue(&Message{
 		ID:        1,
-		Content:   "waiting for logs ...",
+		Content:   fmt.Sprintf("[%s] logs (%s) ...", datetime.Now().Format("YYYY-MM-DD HH:mm:ss"), topic),
 		Timestamp: time.Now().UnixMilli(),
 	})
 	if err := messagesStore.Set(topic, messages); err != nil {
