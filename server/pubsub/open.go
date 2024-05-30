@@ -71,5 +71,20 @@ func Open(ctx context.Context, topic string) error {
 		return fmt.Errorf("failed to create files store: %s", err)
 	}
 
+	// force clean scheduled
+	go func() {
+		for {
+			select {
+			// if context is done, return
+			case <-ctx.Done():
+				return
+			case <-time.After(24 * time.Hour):
+				if err := Close(ctx, topic); err != nil {
+					fmt.Printf("failed to destroy topic %s: %s\n", topic, err)
+				}
+			}
+		}
+	}()
+
 	return nil
 }
