@@ -8,3 +8,7 @@ func GetFile(topic string) (*File, error) {
 
 	return file, nil
 }
+
+func GetTopics() []string {
+	return topicStore.Keys()
+}

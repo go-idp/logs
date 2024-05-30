@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/go-idp/logs"
 	"github.com/go-idp/logs/server/config"
+	"github.com/go-idp/logs/server/pubsub"
 	"github.com/go-idp/logs/server/storage/fs"
 	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/core-utils/fmt"
@@ -59,6 +60,7 @@ func (s *server) Run() error {
 		ctx.JSON(200, zoox.H{
 			"name":    "logs service for idp",
 			"version": logs.Version,
+			"logs":    pubsub.GetTopics(),
 		})
 	})
 
