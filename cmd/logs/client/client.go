@@ -32,6 +32,8 @@ func Register(app *cli.MultipleProgram) {
 			Finish(),
 			Publish(),
 			Subscribe(),
+			//
+			Pipe(),
 		},
 	})
 }
