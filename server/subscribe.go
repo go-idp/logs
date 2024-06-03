@@ -30,6 +30,7 @@ func Subscribe() func(ctx *zoox.Context) {
 				return
 			}
 
+			ctx.SSE().Retry(10)
 			ctx.SSE().Event("message", string(msg))
 
 			// finished
