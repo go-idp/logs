@@ -21,7 +21,7 @@ func Open() func(ctx *zoox.Context) {
 			return
 		}
 
-		welcomMessage := fmt.Sprintf("[%s] logs (%s) ...", datetime.Now().Format("YYYY-MM-DD HH:mm:ss"), id)
+		welcomMessage := fmt.Sprintf("[%s][ID: %s] ...", datetime.Now().Format("YYYY-MM-DD HH:mm:ss"), id)
 		if err := pubsub.Publish(ctx.Context(), id, welcomMessage); err != nil {
 			ctx.Fail(err, http.StatusInternalServerError, fmt.Sprintf("failed to publish topic: %s", err))
 			return
