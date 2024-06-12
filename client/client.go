@@ -1,6 +1,10 @@
 package client
 
-import "context"
+import (
+	"context"
+	"fmt"
+	gurl "net/url"
+)
 
 type Client interface {
 	Open(ctx context.Context, id string) error
@@ -16,39 +20,46 @@ type client struct {
 
 type Option func(cfg *Config)
 
-func New(opts ...Option) (Client, error) {
+func New(opts ...Option) (c Client, err error) {
 	cfg := &Config{}
 	for _, opt := range opts {
 		opt(cfg)
 	}
 
 	// fix the server URL
-	cfg.Server = GetServerURL(cfg.Engine, cfg.Server)
+	cfg.Server, err = GetServerURL(cfg.Engine, cfg.Server)
+	if err != nil {
+		return nil, err
+	}
 
 	return &client{
 		cfg: cfg,
 	}, nil
 }
 
-func GetServerURL(engine string, url string) string {
+func GetServerURL(engine string, url string) (string, error) {
+	u, err := gurl.Parse(url)
+	if err != nil {
+		return "", err
+	}
+
 	switch engine {
 	case "http":
-		return url
+		return url, nil
 	case "websocket":
 		// if https
-		if url[:5] == "https" {
-			return "wss" + url[5:]
-		} else if url[:4] == "http" {
-			// http
-			return "ws" + url[4:]
+		if u.Scheme == "https" {
+			u.Scheme = "wss"
 		} else {
-			return url
+			u.Scheme = "ws"
 		}
+
+		return u.String(), nil
 	case "tcp":
-		return "tcp" + url[4:]
+		return url, nil
 	case "grpc":
-		return "grpc" + url[4:]
+		return url, nil
 	default:
-		return url
+		return "", fmt.Errorf("unsupported engine: %s, only support http, websocket, tcp, and grpc", engine)
 	}
 }
