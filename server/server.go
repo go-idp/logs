@@ -58,7 +58,7 @@ func (s *server) Run() error {
 	}
 
 	{ // websocket
-		s, err := app.WebSocket("/ws")
+		s, err := app.WebSocket("/")
 		if err != nil {
 			return fmt.Errorf("failed to create websocket server: %s", err)
 		}

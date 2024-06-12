@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-zoox/fetch"
+	"github.com/go-zoox/logger"
 	"github.com/go-zoox/websocket"
 	"github.com/go-zoox/websocket/event/cs"
 )
@@ -75,7 +76,7 @@ func (c *client) publishWithWebsocket(ctx context.Context, id string, message st
 		"message": message,
 	}, func(err error, payload cs.EventPayload) {
 		if err != nil {
-			// logger.Infof("failed to publish: %s", err)
+			logger.Infof("failed to publish: %s", err)
 			return
 		}
 	})

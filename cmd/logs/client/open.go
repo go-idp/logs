@@ -19,6 +19,9 @@ func Open() *cli.Command {
 				cfg.Username = ctx.String("username")
 				cfg.Password = ctx.String("password")
 				cfg.Engine = ctx.String("engine")
+
+				// GetServerURL is a function that returns the server URL
+				cfg.Server = GetServerURL(cfg.Engine, cfg.Server)
 			})
 			if err != nil {
 				return err

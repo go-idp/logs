@@ -43,3 +43,26 @@ func Register(app *cli.MultipleProgram) {
 		},
 	})
 }
+
+func GetServerURL(engine string, url string) string {
+	switch engine {
+	case "http":
+		return url
+	case "websocket":
+		// if https
+		if url[:5] == "https" {
+			return "wss" + url[5:]
+		} else if url[:4] == "http" {
+			// http
+			return "ws" + url[4:]
+		} else {
+			return url
+		}
+	case "tcp":
+		return "tcp" + url[4:]
+	case "grpc":
+		return "grpc" + url[4:]
+	default:
+		return url
+	}
+}
