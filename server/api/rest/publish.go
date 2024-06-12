@@ -1,9 +1,9 @@
-package server
+package rest
 
 import (
 	"net/http"
 
-	"github.com/go-idp/logs/server/pubsub"
+	"github.com/go-idp/logs/server/service"
 	"github.com/go-zoox/core-utils/fmt"
 	"github.com/go-zoox/zoox"
 )
@@ -29,7 +29,7 @@ func Publish() func(ctx *zoox.Context) {
 			return
 		}
 
-		if err := pubsub.Publish(ctx.Context(), id, data.Message); err != nil {
+		if err := service.Get().Publish(ctx.Context(), id, data.Message); err != nil {
 			ctx.Fail(err, http.StatusInternalServerError, fmt.Sprintf("failed to publish topic: %s", err))
 			return
 		}

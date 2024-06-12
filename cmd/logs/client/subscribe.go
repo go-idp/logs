@@ -19,6 +19,7 @@ func Subscribe() *cli.Command {
 				cfg.Server = ctx.String("server")
 				cfg.Username = ctx.String("username")
 				cfg.Password = ctx.String("password")
+				cfg.Engine = ctx.String("engine")
 			})
 			if err != nil {
 				return err
@@ -31,7 +32,7 @@ func Subscribe() *cli.Command {
 			}
 
 			return c.Subscribe(context.Background(), id, func(message string) {
-				os.Stdout.WriteString(message)
+				os.Stdout.Write([]byte(message))
 			})
 		},
 	}

@@ -18,6 +18,7 @@ func Open() *cli.Command {
 				cfg.Server = ctx.String("server")
 				cfg.Username = ctx.String("username")
 				cfg.Password = ctx.String("password")
+				cfg.Engine = ctx.String("engine")
 			})
 			if err != nil {
 				return err

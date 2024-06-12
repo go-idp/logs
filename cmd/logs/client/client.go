@@ -26,6 +26,12 @@ func Register(app *cli.MultipleProgram) {
 				Usage:   "Password for Basic Auth",
 				EnvVars: []string{"PASSWORD"},
 			},
+			&cli.StringFlag{
+				Name:    "engine",
+				Usage:   "engine to use, avaliable: http, websocket, tcp, grpc",
+				EnvVars: []string{"ENGINE"},
+				Value:   "http",
+			},
 		},
 		Subcommands: []*cli.Command{
 			Open(),

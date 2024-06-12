@@ -2,8 +2,11 @@ package server
 
 import (
 	"github.com/go-idp/logs"
+	"github.com/go-idp/logs/server/api/rest"
+	"github.com/go-idp/logs/server/api/ws"
 	"github.com/go-idp/logs/server/config"
 	"github.com/go-idp/logs/server/pubsub"
+	"github.com/go-idp/logs/server/service"
 	"github.com/go-idp/logs/server/storage/fs"
 	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/core-utils/fmt"
@@ -44,17 +47,31 @@ func (s *server) Run() error {
 
 	app.Use(Auth())
 
-	//
-	app.Post("/:id/open", Open())
-	app.Post("/:id/finish", Finish())
-	//
-	app.Post("/:id/publish", Publish())
-	app.Post("/:id/subscribe", Subscribe())
-	//
-	app.Get("/:id/stream", Stream())
+	{ // rest
+		app.Post("/:id/open", rest.Open())
+		app.Post("/:id/finish", rest.Finish())
+		//
+		app.Post("/:id/publish", rest.Publish())
+		app.Post("/:id/subscribe", rest.Subscribe())
+		//
+		app.Get("/:id/stream", rest.Stream())
+	}
+
+	{ // websocket
+		s, err := app.WebSocket("/ws")
+		if err != nil {
+			return fmt.Errorf("failed to create websocket server: %s", err)
+		}
+
+		//
+		s.Event("open", ws.Open())
+		s.Event("finish", ws.Finish())
+		s.Event("publish", ws.Publish())
+		s.Event("subscribe", ws.Subscribe())
+	}
 
 	//
-	app.Get("/:id", Get())
+	app.Get("/:id", rest.Get())
 
 	app.Get("/", func(ctx *zoox.Context) {
 		ctx.JSON(200, zoox.H{
@@ -63,6 +80,8 @@ func (s *server) Run() error {
 			"logs":    pubsub.GetTopics(),
 		})
 	})
+
+	service.Get().Setup(s.cfg)
 
 	return app.Run(fmt.Sprintf(":%d", s.cfg.Port))
 }

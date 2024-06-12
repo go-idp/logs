@@ -25,11 +25,6 @@ func Open(ctx context.Context, topic string) error {
 	messages := safe.NewQueue[*Message](func(qc *safe.QueueConfig) {
 		qc.Capacity = DefaultMessageCapacityForEachTopic
 	})
-	// messages.Enqueue(&Message{
-	// 	ID:        1,
-	// 	Content:   fmt.Sprintf("[%s] logs (%s) ...", datetime.Now().Format("YYYY-MM-DD HH:mm:ss"), topic),
-	// 	Timestamp: time.Now().UnixMilli(),
-	// })
 	if err := messagesStore.Set(topic, messages); err != nil {
 		return fmt.Errorf("failed to create messages store: %s", err)
 	}
