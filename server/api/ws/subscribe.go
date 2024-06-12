@@ -26,11 +26,6 @@ func Subscribe() func(conn conn.Conn, payload cs.EventPayload, callback func(err
 				return
 			}
 
-			if message == "[DONE]" {
-				callback(nil, nil)
-				return
-			}
-
 			var ep cs.EventPayload
 			if err := json.Unmarshal([]byte(message), &ep); err != nil {
 				callback(err, nil)
