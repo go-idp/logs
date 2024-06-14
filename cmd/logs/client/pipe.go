@@ -16,6 +16,12 @@ func Pipe() *cli.Command {
 		Usage:     "pipe logs",
 		ArgsUsage: "<id>",
 		Action: func(ctx *cli.Context) (err error) {
+			id := ctx.Args().Get(0)
+			if id == "" {
+				// return cli.ShowCommandHelp(ctx, "publish")
+				return fmt.Errorf("id is required")
+			}
+
 			c, err := client.New(func(cfg *client.Config) {
 				cfg.Server = ctx.String("server")
 				cfg.Username = ctx.String("username")
@@ -26,11 +32,10 @@ func Pipe() *cli.Command {
 				return err
 			}
 
-			id := ctx.Args().Get(0)
-			if id == "" {
-				// return cli.ShowCommandHelp(ctx, "publish")
-				return fmt.Errorf("id is required")
+			if err := c.Connect(); err != nil {
+				return err
 			}
+			defer c.Close()
 
 			for {
 				buf := make([]byte, 1024)

@@ -10,6 +10,7 @@ import (
 	"github.com/go-idp/logs/server/storage/fs"
 	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/core-utils/fmt"
+	es "github.com/go-zoox/websocket/extension/event/server"
 	"github.com/go-zoox/zoox"
 	"github.com/go-zoox/zoox/defaults"
 )
@@ -63,11 +64,11 @@ func (s *server) Run() error {
 			return fmt.Errorf("failed to create websocket server: %s", err)
 		}
 
-		//
-		s.Event("open", ws.Open())
-		s.Event("finish", ws.Finish())
-		s.Event("publish", ws.Publish())
-		s.Event("subscribe", ws.Subscribe())
+		et := es.New(s)
+		et.On("open", ws.Open())
+		et.On("finish", ws.Finish())
+		et.On("publish", ws.Publish())
+		et.On("subscribe", ws.Subscribe())
 	}
 
 	//

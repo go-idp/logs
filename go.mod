@@ -13,7 +13,7 @@ require (
 	github.com/go-zoox/logger v1.5.1
 	github.com/go-zoox/once v0.0.4
 	github.com/go-zoox/uuid v0.0.1
-	github.com/go-zoox/websocket v1.3.1
+	github.com/go-zoox/websocket v1.3.2
 	github.com/go-zoox/zoox v1.15.0
 )
 

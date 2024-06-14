@@ -6,8 +6,7 @@ import (
 
 	"github.com/go-zoox/fetch"
 	"github.com/go-zoox/logger"
-	"github.com/go-zoox/websocket"
-	"github.com/go-zoox/websocket/event/cs"
+	cs "github.com/go-zoox/websocket/extension/event/entity"
 )
 
 func (c *client) Publish(ctx context.Context, id string, message string) error {
@@ -58,20 +57,7 @@ func (c *client) publishWithHTTP(ctx context.Context, id string, message string)
 }
 
 func (c *client) publishWithWebsocket(ctx context.Context, id string, message string) error {
-	ws, err := websocket.NewClient(func(opt *websocket.ClientOption) {
-		opt.Context = ctx
-		opt.Addr = c.cfg.Server
-	})
-	if err != nil {
-		return err
-	}
-
-	if err := ws.Connect(); err != nil {
-		return err
-	}
-	defer ws.Close()
-
-	err = ws.Event("publish", cs.EventPayload{
+	return c.event.Emit("publish", cs.EventPayload{
 		"id":      id,
 		"message": message,
 	}, func(err error, payload cs.EventPayload) {
@@ -80,9 +66,4 @@ func (c *client) publishWithWebsocket(ctx context.Context, id string, message st
 			return
 		}
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

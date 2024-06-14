@@ -14,6 +14,13 @@ func Publish() *cli.Command {
 		Usage:     "publish logs",
 		ArgsUsage: "<id> <message>",
 		Action: func(ctx *cli.Context) (err error) {
+			id := ctx.Args().Get(0)
+			message := ctx.Args().Get(1)
+			if id == "" || message == "" {
+				// return cli.ShowCommandHelp(ctx, "publish")
+				return fmt.Errorf("id and message are required")
+			}
+
 			c, err := client.New(func(cfg *client.Config) {
 				cfg.Server = ctx.String("server")
 				cfg.Username = ctx.String("username")
@@ -24,12 +31,10 @@ func Publish() *cli.Command {
 				return err
 			}
 
-			id := ctx.Args().Get(0)
-			message := ctx.Args().Get(1)
-			if id == "" || message == "" {
-				// return cli.ShowCommandHelp(ctx, "publish")
-				return fmt.Errorf("id and message are required")
+			if err := c.Connect(); err != nil {
+				return err
 			}
+			defer c.Close()
 
 			return c.Publish(context.Background(), id, message)
 		},

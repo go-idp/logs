@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/go-idp/logs/client"
 	"github.com/go-zoox/cli"
@@ -13,8 +14,14 @@ func Subscribe() *cli.Command {
 	return &cli.Command{
 		Name:      "subscribe",
 		Usage:     "subscribe logs",
-		ArgsUsage: "<id>",
+		ArgsUsage: "<id...>",
 		Action: func(ctx *cli.Context) (err error) {
+			ids := ctx.Args().Slice()
+			if len(ids) == 0 {
+				// return cli.ShowCommandHelp(ctx, "subscribe")
+				return fmt.Errorf("id is required")
+			}
+
 			c, err := client.New(func(cfg *client.Config) {
 				cfg.Server = ctx.String("server")
 				cfg.Username = ctx.String("username")
@@ -25,15 +32,29 @@ func Subscribe() *cli.Command {
 				return err
 			}
 
-			id := ctx.Args().Get(0)
-			if id == "" {
-				// return cli.ShowCommandHelp(ctx, "subscribe")
-				return fmt.Errorf("id is required")
+			if err := c.Connect(); err != nil {
+				return err
+			}
+			defer c.Close()
+
+			wg := &sync.WaitGroup{}
+			for _, id := range ids {
+				wg.Add(1)
+				go func(id string) {
+					err := c.Subscribe(context.Background(), id, func(message string) {
+						os.Stdout.Write([]byte(message))
+					})
+					if err != nil {
+						fmt.Println(err)
+					}
+
+					wg.Done()
+				}(id)
 			}
 
-			return c.Subscribe(context.Background(), id, func(message string) {
-				os.Stdout.Write([]byte(message))
-			})
+			wg.Wait()
+
+			return nil
 		},
 	}
 }

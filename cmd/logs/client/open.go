@@ -14,6 +14,12 @@ func Open() *cli.Command {
 		Usage:     "open logs",
 		ArgsUsage: "<id>",
 		Action: func(ctx *cli.Context) (err error) {
+			id := ctx.Args().Get(0)
+			if id == "" {
+				// return cli.ShowCommandHelp(ctx, "open")
+				return fmt.Errorf("id is required")
+			}
+
 			c, err := client.New(func(cfg *client.Config) {
 				cfg.Server = ctx.String("server")
 				cfg.Username = ctx.String("username")
@@ -24,11 +30,10 @@ func Open() *cli.Command {
 				return err
 			}
 
-			id := ctx.Args().Get(0)
-			if id == "" {
-				// return cli.ShowCommandHelp(ctx, "open")
-				return fmt.Errorf("id is required")
+			if err := c.Connect(); err != nil {
+				return err
 			}
+			defer c.Close()
 
 			return c.Open(context.Background(), id)
 		},

@@ -4,9 +4,17 @@ import (
 	"context"
 	"fmt"
 	gurl "net/url"
+	"time"
+
+	"github.com/go-zoox/websocket"
+
+	ec "github.com/go-zoox/websocket/extension/event/client"
 )
 
 type Client interface {
+	Connect() error
+	Close() error
+	//
 	Open(ctx context.Context, id string) error
 	Finish(ctx context.Context, id string) error
 	//
@@ -16,6 +24,9 @@ type Client interface {
 
 type client struct {
 	cfg *Config
+
+	ws    websocket.Client
+	event ec.Client
 }
 
 type Option func(cfg *Config)
@@ -32,8 +43,25 @@ func New(opts ...Option) (c Client, err error) {
 		return nil, err
 	}
 
+	var event ec.Client
+	var ws websocket.Client
+	if cfg.Engine == "websocket" {
+		ws, err = websocket.NewClient(func(opt *websocket.ClientOption) {
+			// opt.Context = ctx
+			opt.Addr = cfg.Server
+			opt.ConnectTimeout = 10 * time.Second
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		event = ec.New(ws)
+	}
+
 	return &client{
-		cfg: cfg,
+		cfg:   cfg,
+		ws:    ws,
+		event: event,
 	}, nil
 }
 

@@ -8,9 +8,8 @@ import (
 
 	"github.com/go-zoox/core-utils/strings"
 	"github.com/go-zoox/fetch"
-	"github.com/go-zoox/websocket"
-	wsc "github.com/go-zoox/websocket/client"
-	"github.com/go-zoox/websocket/event/cs"
+	ec "github.com/go-zoox/websocket/extension/event/client"
+	cs "github.com/go-zoox/websocket/extension/event/entity"
 )
 
 func (c *client) Subscribe(ctx context.Context, id string, fn func(message string)) error {
@@ -94,25 +93,13 @@ func (c *client) subscribeWithHTTP(ctx context.Context, id string, fn func(messa
 }
 
 func (c *client) subscribeWithWebsocket(ctx context.Context, id string, fn func(message string)) error {
-	ws, err := websocket.NewClient(func(opt *websocket.ClientOption) {
-		opt.Context = ctx
-		opt.Addr = c.cfg.Server
-	})
-	if err != nil {
-		return err
-	}
-
-	if err := ws.Connect(); err != nil {
-		return err
-	}
-	defer ws.Close()
 
 	done := make(chan struct{})
 	errCh := make(chan error)
 	defer close(done)
 	defer close(errCh)
 
-	err = ws.Event(
+	err := c.event.Emit(
 		"subscribe",
 		cs.EventPayload{
 			"id": id,
@@ -133,7 +120,7 @@ func (c *client) subscribeWithWebsocket(ctx context.Context, id string, fn func(
 				}
 			}
 		},
-		func(cfg *wsc.EventConfig) {
+		func(cfg *ec.EmitConfig) {
 			cfg.IsSubscribe = true
 		},
 	)

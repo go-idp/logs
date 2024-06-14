@@ -3,7 +3,7 @@ package ws
 import (
 	"github.com/go-idp/logs/server/service"
 	"github.com/go-zoox/websocket/conn"
-	"github.com/go-zoox/websocket/event/cs"
+	cs "github.com/go-zoox/websocket/extension/event/entity"
 )
 
 type DataOpen struct {
