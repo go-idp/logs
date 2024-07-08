@@ -26,7 +26,7 @@ func (s *service) Subscribe(ctx context.Context, id string, handler func(err err
 			"ts":  message.Timestamp,
 		})
 		if err != nil {
-			handler(fmt.Errorf("failed to marshal message: %s", err), "")
+			handler(fmt.Errorf("[subscribe] failed to marshal message: %s", err), "")
 			return
 		}
 

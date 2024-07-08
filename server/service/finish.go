@@ -21,17 +21,17 @@ func (s *service) Finish(ctx context.Context, id string) error {
 	// get file
 	file, err := pubsub.GetFile(id)
 	if err != nil {
-		return fmt.Errorf("failed to get file path (topic: %s, err: %s)", id, err)
+		return fmt.Errorf("[finish] failed to get file path (id: %s, err: %s)", id, err)
 	}
 	defer file.Clean()
 
 	if err := pubsub.Close(ctx, id); err != nil {
-		return fmt.Errorf("failed to destroy topic(%s): %s", id, err)
+		return fmt.Errorf("[finish] failed to close pubsub(id: %s): %s", id, err)
 	}
 
 	reader, err := file.GetReader()
 	if err != nil {
-		return fmt.Errorf("failed to get file reader (topic: %s, err: %s)", id, err)
+		return fmt.Errorf("[finish] failed to get file reader (id: %s, err: %s)", id, err)
 	}
 	defer reader.Close()
 
@@ -39,12 +39,12 @@ func (s *service) Finish(ctx context.Context, id string) error {
 	case "oss":
 		err := oss.Get().Put(id, reader)
 		if err != nil {
-			return fmt.Errorf("failed to get file path from oss (topic: %s, err: %s)", id, err)
+			return fmt.Errorf("[finish] failed to get file path from oss (id: %s, err: %s)", id, err)
 		}
 	default:
 		err = fs.Get().Put(id, reader)
 		if err != nil {
-			return fmt.Errorf("failed to get file path from fs (topic: %s, err: %s)", id, err)
+			return fmt.Errorf("[finish] failed to get file path from fs (id: %s, err: %s)", id, err)
 		}
 	}
 

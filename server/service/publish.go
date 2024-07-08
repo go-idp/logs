@@ -17,7 +17,7 @@ func (s *service) Publish(ctx context.Context, id string, message string) error 
 	}
 
 	if err := pubsub.Publish(ctx, id, message); err != nil {
-		return fmt.Errorf("failed to publish topic: %s", err)
+		return fmt.Errorf("[publish] failed to publish log (id: %s): %s", id, err)
 	}
 
 	return nil
