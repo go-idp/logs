@@ -22,6 +22,8 @@ func (s *service) Open(ctx context.Context, id string) error {
 		return fmt.Errorf("[open] failed to create log(id: %s): %s", id, err)
 	}
 
+	s.manager.Create(id)
+
 	welcomMessage := fmt.Sprintf("[%s][ID: %s] ...\n", datetime.Now().Format("YYYY-MM-DD HH:mm:ss"), id)
 	if err := pubsub.Publish(ctx, id, welcomMessage); err != nil {
 		return fmt.Errorf("[open] failed to publish log(id: %s): %s", id, err)

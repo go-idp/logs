@@ -16,6 +16,8 @@ func (s *service) Publish(ctx context.Context, id string, message string) error 
 		return fmt.Errorf("id is required")
 	}
 
+	s.manager.Update(id, message)
+
 	if err := pubsub.Publish(ctx, id, message); err != nil {
 		return fmt.Errorf("[publish] failed to publish log (id: %s): %s", id, err)
 	}

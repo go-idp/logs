@@ -18,6 +18,8 @@ func (s *service) Finish(ctx context.Context, id string) error {
 		return fmt.Errorf("id is required")
 	}
 
+	s.manager.Delete(id)
+
 	// get file
 	file, err := pubsub.GetFile(id)
 	if err != nil {
