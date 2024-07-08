@@ -74,6 +74,9 @@ func (m *manager) Create(id string) {
 
 func (m *manager) Update(id string, message string) {
 	ins := m.runnings.Get(id)
+	if ins == nil {
+		return
+	}
 
 	ins.Size.Set(ins.Size.Get() + int64(len(message)))
 	ins.UpdatedAt = now()
@@ -83,12 +86,15 @@ func (m *manager) Update(id string, message string) {
 
 func (m *manager) Delete(id string) {
 	ins := m.runnings.Get(id)
+	if ins == nil {
+		return
+	}
+
 	ins.FinishedAt = now()
 
 	m.runnings.Del(id)
-	m.status.Count.Running--
-
 	m.finisheds.Set(id, ins)
+	m.status.Count.Running--
 	m.status.Count.Finished++
 }
 
