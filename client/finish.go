@@ -24,7 +24,7 @@ func (c *client) Finish(ctx context.Context, id string) error {
 	} else {
 		topic.Ticker.Stop()
 		if err := c.flushPublish(ctx, id); err != nil {
-			logger.Infof("failed to flush before finish: %s", err)
+			return fmt.Errorf("failed to flush before finish: %s", err)
 		}
 		c.publishStore.Del(id)
 	}
