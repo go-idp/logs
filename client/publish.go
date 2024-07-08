@@ -3,11 +3,18 @@ package client
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/go-zoox/core-utils/strings"
 	"github.com/go-zoox/fetch"
 	"github.com/go-zoox/logger"
 	cs "github.com/go-zoox/websocket/extension/event/entity"
 )
+
+type publishTopic struct {
+	Data   strings.Builder
+	Ticker *time.Ticker
+}
 
 func (c *client) Publish(ctx context.Context, id string, message string) error {
 	if c.cfg == nil {
@@ -18,14 +25,38 @@ func (c *client) Publish(ctx context.Context, id string, message string) error {
 		return fmt.Errorf("id is required")
 	}
 
-	switch c.cfg.Engine {
-	case "websocket":
-		return c.publishWithWebsocket(ctx, id, message)
-	case "http":
-		return c.publishWithHTTP(ctx, id, message)
-	default:
-		return fmt.Errorf("unsupported engine: %s, only support websocket and http", c.cfg.Engine)
+	topic := c.publishStore.Get(id)
+	if topic == nil {
+		return fmt.Errorf("cannot publish before open")
 	}
+
+	if _, err := topic.Data.Write([]byte(message)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *client) flushPublish(ctx context.Context, id string) error {
+	topic := c.publishStore.Get(id)
+	if topic != nil {
+		if topic.Data.Len() == 0 {
+			return nil
+		}
+		defer topic.Data.Reset()
+		message := topic.Data.String()
+
+		switch c.cfg.Engine {
+		case "websocket":
+			return c.publishWithWebsocket(ctx, id, message)
+		case "http":
+			return c.publishWithHTTP(ctx, id, message)
+		default:
+			return fmt.Errorf("unsupported engine: %s, only support websocket and http", c.cfg.Engine)
+		}
+	}
+
+	return nil
 }
 
 func (c *client) publishWithHTTP(ctx context.Context, id string, message string) error {

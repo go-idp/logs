@@ -6,6 +6,7 @@ import (
 	gurl "net/url"
 	"time"
 
+	"github.com/go-zoox/core-utils/safe"
 	"github.com/go-zoox/websocket"
 
 	ec "github.com/go-zoox/websocket/extension/event/client"
@@ -27,6 +28,8 @@ type client struct {
 
 	ws    websocket.Client
 	event ec.Client
+
+	publishStore *safe.Map[string, *publishTopic]
 }
 
 type Option func(cfg *Config)
@@ -62,6 +65,8 @@ func New(opts ...Option) (c Client, err error) {
 		cfg:   cfg,
 		ws:    ws,
 		event: event,
+		//
+		publishStore: safe.NewMap[string, *publishTopic](),
 	}, nil
 }
 

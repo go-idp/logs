@@ -18,6 +18,17 @@ func (c *client) Finish(ctx context.Context, id string) error {
 		return fmt.Errorf("id is required")
 	}
 
+	topic := c.publishStore.Get(id)
+	if topic == nil {
+		return fmt.Errorf("cannot finish before open")
+	} else {
+		topic.Ticker.Stop()
+		if err := c.flushPublish(ctx, id); err != nil {
+			logger.Infof("failed to flush before finish: %s", err)
+		}
+		c.publishStore.Del(id)
+	}
+
 	switch c.cfg.Engine {
 	case "websocket":
 		return c.finishWithWebsocket(ctx, id)

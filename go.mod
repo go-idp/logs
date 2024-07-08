@@ -5,7 +5,7 @@ go 1.22.1
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/go-zoox/cli v1.4.0
-	github.com/go-zoox/core-utils v1.4.10
+	github.com/go-zoox/core-utils v1.4.11
 	github.com/go-zoox/datetime v1.3.1
 	github.com/go-zoox/fetch v1.8.2
 	github.com/go-zoox/fs v1.3.15
