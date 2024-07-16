@@ -2,6 +2,7 @@ package manager
 
 import (
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/go-zoox/core-utils/safe"
@@ -44,6 +45,8 @@ type manager struct {
 	finisheds *safe.Map[string, *Task]
 
 	status Status
+
+	*sync.RWMutex
 }
 
 func New() Manager {
@@ -62,6 +65,9 @@ func New() Manager {
 }
 
 func (m *manager) Create(id string) {
+	m.Lock()
+	defer m.Unlock()
+
 	ins := &Task{
 		ID:        id,
 		StartedAt: now(),
@@ -73,6 +79,9 @@ func (m *manager) Create(id string) {
 }
 
 func (m *manager) Update(id string, message string) {
+	m.Lock()
+	defer m.Unlock()
+
 	ins := m.runnings.Get(id)
 	if ins == nil {
 		return
@@ -85,6 +94,9 @@ func (m *manager) Update(id string, message string) {
 }
 
 func (m *manager) Delete(id string) {
+	m.Lock()
+	defer m.Unlock()
+
 	ins := m.runnings.Get(id)
 	if ins == nil {
 		return
@@ -99,6 +111,9 @@ func (m *manager) Delete(id string) {
 }
 
 func (m *manager) Status() Status {
+	m.RLock()
+	defer m.RUnlock()
+
 	m.status.Detail.Runnings = m.GetRunnings()
 	m.status.Detail.Finisheds = m.GetFinisheds()
 
