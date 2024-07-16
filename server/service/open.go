@@ -33,9 +33,9 @@ func (s *service) Open(ctx context.Context, id string) error {
 	go func() {
 		for {
 			select {
-			// if context is done, return
-			case <-ctx.Done():
-				return
+			// // if context is done, return
+			// case <-ctx.Done():
+			// 	return
 			case <-time.After(24 * time.Hour):
 				if err := s.Finish(ctx, id); err != nil {
 					fmt.Printf("[open] failed to finish log(id: %s): %s\n", id, err)
