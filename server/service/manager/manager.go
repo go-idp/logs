@@ -70,9 +70,11 @@ func (m *manager) Create(id string) {
 	m.Lock()
 	defer m.Unlock()
 
+	n := now()
 	ins := &Task{
 		ID:        id,
-		StartedAt: now(),
+		StartedAt: n,
+		UpdatedAt: n,
 	}
 
 	m.runnings.Set(id, ins)
@@ -92,7 +94,7 @@ func (m *manager) Update(id string, message string) {
 	ins.Size.Set(ins.Size.Get() + int64(len(message)))
 	ins.UpdatedAt = now()
 
-	m.runnings.Set(id, ins)
+	// m.runnings.Set(id, ins)
 }
 
 func (m *manager) Delete(id string) {
@@ -131,7 +133,7 @@ func (m *manager) GetRunnings() (tasks []*Task) {
 	})
 
 	sort.Slice(tasks, func(i, j int) bool {
-		return (*tasks[i].StartedAt).After(*(tasks[j].StartedAt))
+		return (*tasks[i].UpdatedAt).After(*(tasks[j].UpdatedAt))
 	})
 
 	return
