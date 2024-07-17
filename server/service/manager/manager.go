@@ -14,6 +14,8 @@ type Manager interface {
 	Delete(id string)
 	//
 	Status() Status
+	//
+	IsRunning(id string) bool
 }
 
 type Task struct {
@@ -46,7 +48,7 @@ type manager struct {
 
 	status Status
 
-	*sync.RWMutex
+	sync.RWMutex
 }
 
 func New() Manager {
@@ -148,6 +150,17 @@ func (m *manager) GetFinisheds() (tasks []*Task) {
 	})
 
 	return
+}
+
+func (m *manager) IsRunning(id string) bool {
+	m.RLock()
+	defer m.RUnlock()
+
+	if task := m.runnings.Get(id); task != nil {
+		return true
+	}
+
+	return false
 }
 
 func now() *time.Time {
