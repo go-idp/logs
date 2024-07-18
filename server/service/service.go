@@ -18,6 +18,8 @@ type Service interface {
 	Setup(cfg *config.Config) error
 	//
 	Status() any
+	//
+	IsRunning(ctx context.Context, id string) bool
 }
 
 type service struct {

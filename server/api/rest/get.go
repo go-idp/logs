@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-idp/logs/server/config"
+	"github.com/go-idp/logs/server/service"
 	"github.com/go-idp/logs/server/storage/fs"
 	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/headers"
@@ -18,6 +19,12 @@ func Get() func(ctx *zoox.Context) {
 	return func(ctx *zoox.Context) {
 		if ctx.Path == "" {
 			ctx.Error(http.StatusNotFound, "Not Found")
+			return
+		}
+
+		id := ctx.Param().Get("id").String()
+		if ok := service.Get().IsRunning(ctx.Context(), id); ok {
+			ctx.String(http.StatusOK, "Task is Running")
 			return
 		}
 
