@@ -20,6 +20,8 @@ type Service interface {
 	Status() any
 	//
 	IsRunning(ctx context.Context, id string) bool
+	//
+	Data() manager.Manager
 }
 
 type service struct {
@@ -48,4 +50,8 @@ func (s *service) Setup(cfg *config.Config) error {
 
 func (s *service) Status() any {
 	return s.manager.Status()
+}
+
+func (s *service) Data() manager.Manager {
+	return s.manager
 }

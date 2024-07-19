@@ -48,6 +48,38 @@ func (s *server) Run() error {
 
 	app.Use(Auth())
 
+	// objects: list + retrieve
+	app.Group("/objects", func(group *zoox.RouterGroup) {
+		group.Get("/", func(ctx *zoox.Context) {
+			tasks, err := service.Get().Data().List()
+			if err != nil {
+				ctx.Error(500, err.Error())
+				return
+			}
+
+			ctx.Success(zoox.H{
+				"data":  tasks,
+				"total": len(tasks),
+			})
+		})
+
+		group.Get("/:id", func(ctx *zoox.Context) {
+			id := ctx.Param().Get("id").String()
+			if id == "" {
+				ctx.Error(400, "id is required")
+				return
+			}
+
+			task, err := service.Get().Data().Retrieve(id)
+			if err != nil {
+				ctx.Error(404, err.Error())
+				return
+			}
+
+			ctx.Success(task)
+		})
+	})
+
 	{ // rest
 		app.Post("/:id/open", rest.Open())
 		app.Post("/:id/finish", rest.Finish())

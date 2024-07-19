@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"fmt"
 	"sort"
 	"sync"
 	"time"
@@ -16,6 +17,9 @@ type Manager interface {
 	Status() Status
 	//
 	IsRunning(id string) bool
+	//
+	List() ([]*Task, error)
+	Retrieve(id string) (*Task, error)
 }
 
 type Task struct {
@@ -27,19 +31,9 @@ type Task struct {
 }
 
 type Status struct {
-	Count  StatusCount  `json:"count"`
-	Detail StatusDetail `json:"detail"`
-}
-
-type StatusCount struct {
 	Total    int64 `json:"total"`
 	Running  int64 `json:"running"`
 	Finished int64 `json:"finished"`
-}
-
-type StatusDetail struct {
-	Runnings  []*Task `json:"runnings"`
-	Finisheds []*Task `json:"finisheds"`
 }
 
 type manager struct {
@@ -78,8 +72,8 @@ func (m *manager) Create(id string) {
 	}
 
 	m.runnings.Set(id, ins)
-	m.status.Count.Total++
-	m.status.Count.Running++
+	m.status.Total++
+	m.status.Running++
 }
 
 func (m *manager) Update(id string, message string) {
@@ -110,17 +104,11 @@ func (m *manager) Delete(id string) {
 
 	m.runnings.Del(id)
 	m.finisheds.Set(id, ins)
-	m.status.Count.Running--
-	m.status.Count.Finished++
+	m.status.Running--
+	m.status.Finished++
 }
 
 func (m *manager) Status() Status {
-	m.RLock()
-	defer m.RUnlock()
-
-	m.status.Detail.Runnings = m.GetRunnings()
-	m.status.Detail.Finisheds = m.GetFinisheds()
-
 	return m.status
 }
 
@@ -163,6 +151,25 @@ func (m *manager) IsRunning(id string) bool {
 	}
 
 	return false
+}
+
+func (m *manager) List() (tasks []*Task, err error) {
+	tasks = make([]*Task, 0)
+	tasks = append(tasks, m.GetRunnings()...)
+	tasks = append(tasks, m.GetFinisheds()...)
+	return tasks, nil
+}
+
+func (m *manager) Retrieve(id string) (*Task, error) {
+	if task := m.runnings.Get(id); task != nil {
+		return task, nil
+	}
+
+	if task := m.finisheds.Get(id); task != nil {
+		return task, nil
+	}
+
+	return nil, fmt.Errorf("task not found")
 }
 
 func now() *time.Time {
