@@ -9,6 +9,7 @@ import (
 	"github.com/go-idp/logs/server/storage/fs"
 	"github.com/go-idp/logs/server/storage/oss"
 	"github.com/go-zoox/core-utils/fmt"
+	"github.com/go-zoox/datetime"
 	es "github.com/go-zoox/websocket/extension/event/server"
 	"github.com/go-zoox/zoox"
 	"github.com/go-zoox/zoox/defaults"
@@ -75,9 +76,10 @@ func (s *server) Run() error {
 
 	app.Get("/", func(ctx *zoox.Context) {
 		ctx.JSON(200, zoox.H{
-			"name":    "logs service for idp",
-			"version": logs.Version,
-			"status":  service.Get().Status(),
+			"name":       "logs service for idp",
+			"version":    logs.Version,
+			"status":     service.Get().Status(),
+			"running_at": datetime.Now().Format("YYYY-MM-DD HH:mm:ss"),
 		})
 	})
 
