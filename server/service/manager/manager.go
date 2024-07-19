@@ -25,6 +25,7 @@ type Manager interface {
 type Task struct {
 	ID         string     `json:"id"`
 	Size       safe.Int64 `json:"size"`
+	Status     string     `json:"status"`
 	StartedAt  *time.Time `json:"started_at"`
 	UpdatedAt  *time.Time `json:"updated_at"`
 	FinishedAt *time.Time `json:"finished_at"`
@@ -67,6 +68,7 @@ func (m *manager) Create(id string) {
 	n := now()
 	ins := &Task{
 		ID:        id,
+		Status:    "running",
 		StartedAt: n,
 		UpdatedAt: n,
 	}
@@ -100,6 +102,7 @@ func (m *manager) Delete(id string) {
 		return
 	}
 
+	ins.Status = "finished"
 	ins.FinishedAt = now()
 
 	m.runnings.Del(id)
