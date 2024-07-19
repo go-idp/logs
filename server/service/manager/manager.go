@@ -53,7 +53,7 @@ type manager struct {
 
 func New() Manager {
 	runnings := safe.NewMap[string, *Task](func(mc *safe.MapConfig) {
-		mc.Capacity = 30
+		mc.Capacity = 10000
 	})
 
 	finisheds := safe.NewMap[string, *Task](func(mc *safe.MapConfig) {
