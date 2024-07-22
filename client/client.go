@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	gurl "net/url"
+	"sync"
 	"time"
 
 	"github.com/go-zoox/core-utils/safe"
@@ -30,6 +31,8 @@ type client struct {
 	event ec.Client
 
 	publishStore *safe.Map[string, *publishTopic]
+
+	flushPublishLocker sync.Mutex
 }
 
 type Option func(cfg *Config)

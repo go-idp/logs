@@ -38,6 +38,9 @@ func (c *client) Publish(ctx context.Context, id string, message string) error {
 }
 
 func (c *client) flushPublish(ctx context.Context, id string) error {
+	c.flushPublishLocker.Lock()
+	defer c.flushPublishLocker.Unlock()
+
 	topic := c.publishStore.Get(id)
 	if topic != nil {
 		if topic.Data.Len() == 0 {
