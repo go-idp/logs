@@ -21,9 +21,7 @@ func Open(ctx context.Context, topic string) error {
 	}
 
 	// create messages store
-	messages := safe.NewQueue[*Message](func(qc *safe.QueueConfig) {
-		qc.Capacity = DefaultMessageCapacityForEachTopic
-	})
+	messages := safe.NewQueue[*Message]()
 	if err := messagesStore.Set(topic, messages); err != nil {
 		return fmt.Errorf("failed to create messages store: %s", err)
 	}
@@ -34,9 +32,7 @@ func Open(ctx context.Context, topic string) error {
 	}
 
 	// create subscribes store
-	subscribe := safe.NewMap[string, func(message *Message)](func(mc *safe.MapConfig) {
-		mc.Capacity = DefaultSubscruberCapacityForEachTopic
-	})
+	subscribe := safe.NewMap[string, func(message *Message)]()
 	if err := subscribersStore.Set(topic, subscribe); err != nil {
 		return fmt.Errorf("failed to create subscribes store: %s", err)
 	}

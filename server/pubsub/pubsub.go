@@ -31,13 +31,7 @@ type File struct {
 	GetReader func() (io.ReadCloser, error)
 }
 
-const DefaultTopicCapacity = 1000
-const DefaultMessageCapacityForEachTopic = 100
-const DefaultSubscruberCapacityForEachTopic = 1000
-
-var topicStore = safe.NewMap[string, bool](func(mc *safe.MapConfig) {
-	mc.Capacity = DefaultTopicCapacity
-})
+var topicStore = safe.NewMap[string, bool]()
 
 var countsStore = safe.NewMap[string, int64]()
 
