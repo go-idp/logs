@@ -1,4 +1,4 @@
 package logs
 
 // Version is the version of ingress
-var Version = "1.4.11"
+var Version = "1.4.12"
