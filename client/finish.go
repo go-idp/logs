@@ -21,12 +21,13 @@ func (c *client) Finish(ctx context.Context, id string) error {
 	topic := c.publishStore.Get(id)
 	if topic == nil {
 		return fmt.Errorf("cannot finish before open")
-	} else {
-		topic.Ticker.Stop()
-		if err := c.flushPublish(ctx, id); err != nil {
-			return fmt.Errorf("failed to flush before finish: %s", err)
-		}
-		c.publishStore.Del(id)
+	}
+	defer func() {
+		topic.Done <- struct{}{}
+	}()
+
+	if err := c.flushPublish(ctx, id); err != nil {
+		return fmt.Errorf("failed to flush before finish: %s", err)
 	}
 
 	switch c.cfg.Engine {

@@ -14,9 +14,13 @@ import (
 type publishTopic struct {
 	Data   strings.Builder
 	Ticker *time.Ticker
+	Done   chan struct{}
 }
 
 func (c *client) Publish(ctx context.Context, id string, message string) error {
+	c.flushPublishLocker.Lock()
+	defer c.flushPublishLocker.Unlock()
+
 	if c.cfg == nil {
 		return fmt.Errorf("client is not setup")
 	}
@@ -43,11 +47,11 @@ func (c *client) flushPublish(ctx context.Context, id string) error {
 
 	topic := c.publishStore.Get(id)
 	if topic != nil {
-		if topic.Data.Len() == 0 {
+		message := topic.Data.String()
+		if len(message) == 0 {
 			return nil
 		}
 		defer topic.Data.Reset()
-		message := topic.Data.String()
 
 		switch c.cfg.Engine {
 		case "websocket":

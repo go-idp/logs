@@ -22,13 +22,18 @@ func (c *client) Open(ctx context.Context, id string) error {
 
 	topic := &publishTopic{
 		Data:   strings.NewBuilder(),
-		Ticker: time.NewTicker(1 * time.Second),
+		Ticker: time.NewTicker(1000 * time.Millisecond),
+		Done:   make(chan struct{}),
 	}
 	c.publishStore.Set(id, topic)
 
 	go func() {
 		for {
 			select {
+			case <-topic.Done:
+				topic.Ticker.Stop()
+				c.publishStore.Del(id)
+				return
 			case <-topic.Ticker.C:
 				if err := c.flushPublish(ctx, id); err != nil {
 					logger.Infof("failed to flush: %s", err)
