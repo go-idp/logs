@@ -13,8 +13,8 @@ require (
 	github.com/go-zoox/logger v1.5.1
 	github.com/go-zoox/once v0.0.4
 	github.com/go-zoox/uuid v0.0.1
-	github.com/go-zoox/websocket v1.3.2
-	github.com/go-zoox/zoox v1.15.3
+	github.com/go-zoox/websocket v1.3.4
+	github.com/go-zoox/zoox v1.15.8
 )
 
 require (
@@ -53,7 +53,7 @@ require (
 	github.com/go-zoox/dotenv v1.3.0 // indirect
 	github.com/go-zoox/encoding v1.2.1 // indirect
 	github.com/go-zoox/errors v1.0.2 // indirect
-	github.com/go-zoox/eventemitter v1.4.0 // indirect
+	github.com/go-zoox/eventemitter v1.4.1 // indirect
 	github.com/go-zoox/gzip v1.0.0 // indirect
 	github.com/go-zoox/i18n v1.0.3 // indirect
 	github.com/go-zoox/ini v1.0.4 // indirect
@@ -66,7 +66,7 @@ require (
 	github.com/go-zoox/pubsub v1.2.3 // indirect
 	github.com/go-zoox/random v1.0.4 // indirect
 	github.com/go-zoox/ratelimit v1.2.1 // indirect
-	github.com/go-zoox/safe v1.0.1 // indirect
+	github.com/go-zoox/safe v1.2.0 // indirect
 	github.com/go-zoox/session v1.2.0 // indirect
 	github.com/go-zoox/tag v1.3.3 // indirect
 	github.com/goccy/go-yaml v1.11.3 // indirect
