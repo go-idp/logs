@@ -44,6 +44,8 @@ func New() (Server, error) {
 }
 
 func (s *server) Run() error {
+	runningAt := datetime.Now().Format("YYYY-MM-DD HH:mm:ss")
+
 	app := defaults.Default()
 
 	app.Use(Auth())
@@ -111,7 +113,7 @@ func (s *server) Run() error {
 			"name":       "logs service for idp",
 			"version":    logs.Version,
 			"status":     service.Get().Status(),
-			"running_at": datetime.Now().Format("YYYY-MM-DD HH:mm:ss"),
+			"running_at": runningAt,
 		})
 	})
 
